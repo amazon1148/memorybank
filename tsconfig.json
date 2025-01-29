@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist/lib",
+    "rootDir": "..",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "noImplicitAny": true
+  },
+  "include": ["./**/*.ts", "../scripts/**/*.ts"],
+  "references": [{ "path": "../scripts" }]
+}
