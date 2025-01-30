@@ -98,8 +98,14 @@ export async function getMemorybankProgress(filePath: string): Promise<Memoryban
         status = "❌";
       }
 
+      // Remove status emoji using string operations instead of regex
+      let cleanText = itemText;
+      if (status !== "pending") {
+        cleanText = itemText.slice(status.length).trim();
+      }
+
       currentSubsection.items.push({
-        text: itemText.replace(/^[✅⚠️❌]\s*/, ""),
+        text: cleanText,
         status,
       });
     }
