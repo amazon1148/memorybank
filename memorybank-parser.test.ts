@@ -10,6 +10,27 @@ import {
   MemorybankItem,
 } from "./memorybank-parser";
 
+/**
+ * Create a test item with the given text and status
+ */
+function createItem(text: string, status: MemorybankItem["status"]): MemorybankItem {
+  return { text, status };
+}
+
+/**
+ * Create a test subsection with the given title and items
+ */
+function createSubsection(title: string, items: MemorybankItem[]): MemorybankSubsection {
+  return { title, items };
+}
+
+/**
+ * Create a test section with the given title and subsections
+ */
+function createSection(title: string, subsections: MemorybankSubsection[]): MemorybankSection {
+  return { title, subsections };
+}
+
 describe("memorybank-parser", () => {
   const testDir = path.join(os.tmpdir(), "memorybank-parser-test");
   const testFile = path.join(testDir, "test.md");
@@ -43,37 +64,22 @@ describe("memorybank-parser", () => {
 
     const expectedProgress: MemorybankProgress = {
       sections: [
-        {
-          title: "Section 1",
-          subsections: [
-            {
-              title: "Subsection 1.1",
-              items: [
-                { text: "Completed item", status: "✅" },
-                { text: "Partial item", status: "⚠️" },
-                { text: "Failed item", status: "❌" },
-                { text: "Pending item", status: "pending" },
-              ],
-            },
-            {
-              title: "Subsection 1.2",
-              items: [
-                { text: "Another completed item", status: "✅" },
-              ],
-            },
-          ],
-        },
-        {
-          title: "Section 2",
-          subsections: [
-            {
-              title: "Default",
-              items: [
-                { text: "Direct section item", status: "✅" },
-              ],
-            },
-          ],
-        },
+        createSection("Section 1", [
+          createSubsection("Subsection 1.1", [
+            createItem("Completed item", "✅"),
+            createItem("Partial item", "⚠️"),
+            createItem("Failed item", "❌"),
+            createItem("Pending item", "pending"),
+          ]),
+          createSubsection("Subsection 1.2", [
+            createItem("Another completed item", "✅"),
+          ]),
+        ]),
+        createSection("Section 2", [
+          createSubsection("Default", [
+            createItem("Direct section item", "✅"),
+          ]),
+        ]),
       ],
     };
 
@@ -103,14 +109,8 @@ describe("memorybank-parser", () => {
 
     const expectedProgress: MemorybankProgress = {
       sections: [
-        {
-          title: "Empty Section 1",
-          subsections: [],
-        },
-        {
-          title: "Empty Section 2",
-          subsections: [],
-        },
+        createSection("Empty Section 1", []),
+        createSection("Empty Section 2", []),
       ],
     };
 
@@ -129,19 +129,10 @@ describe("memorybank-parser", () => {
 
     const expectedProgress: MemorybankProgress = {
       sections: [
-        {
-          title: "Section 1",
-          subsections: [
-            {
-              title: "Empty Subsection 1",
-              items: [],
-            },
-            {
-              title: "Empty Subsection 2",
-              items: [],
-            },
-          ],
-        },
+        createSection("Section 1", [
+          createSubsection("Empty Subsection 1", []),
+          createSubsection("Empty Subsection 2", []),
+        ]),
       ],
     };
 
