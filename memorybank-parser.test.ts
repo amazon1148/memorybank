@@ -22,7 +22,7 @@ describe("memorybank-parser", () => {
     await fs.rm(testDir, { recursive: true, force: true });
   });
 
-  it("should parse sections and subsections correctly", async () => {
+  it("should parse complete progress structure", async () => {
     const content = `
 ## Section 1
 ### Subsection 1.1
@@ -41,65 +41,111 @@ describe("memorybank-parser", () => {
     await fs.writeFile(testFile, content);
     const result = await getMemorybankProgress(testFile);
 
-    const expectedSection1: MemorybankSection = {
-      title: "Section 1",
-      subsections: [
+    const expectedProgress: MemorybankProgress = {
+      sections: [
         {
-          title: "Subsection 1.1",
-          items: [
-            { text: "Completed item", status: "✅" },
-            { text: "Partial item", status: "⚠️" },
-            { text: "Failed item", status: "❌" },
-            { text: "Pending item", status: "pending" },
+          title: "Section 1",
+          subsections: [
+            {
+              title: "Subsection 1.1",
+              items: [
+                { text: "Completed item", status: "✅" },
+                { text: "Partial item", status: "⚠️" },
+                { text: "Failed item", status: "❌" },
+                { text: "Pending item", status: "pending" },
+              ],
+            },
+            {
+              title: "Subsection 1.2",
+              items: [
+                { text: "Another completed item", status: "✅" },
+              ],
+            },
           ],
         },
         {
-          title: "Subsection 1.2",
-          items: [
-            { text: "Another completed item", status: "✅" },
+          title: "Section 2",
+          subsections: [
+            {
+              title: "Default",
+              items: [
+                { text: "Direct section item", status: "✅" },
+              ],
+            },
           ],
         },
       ],
     };
 
-    const expectedSection2: MemorybankSection = {
-      title: "Section 2",
-      subsections: [
-        {
-          title: "Default",
-          items: [
-            { text: "Direct section item", status: "✅" },
-          ],
-        },
-      ],
-    };
-
-    expect(result.sections).toHaveLength(2);
-    expect(result.sections[0]).toEqual(expectedSection1);
-    expect(result.sections[1]).toEqual(expectedSection2);
+    expect(result).toEqual(expectedProgress);
   });
 
-  it("should handle empty sections and subsections", async () => {
+  it("should handle empty progress", async () => {
+    const content = "";
+    await fs.writeFile(testFile, content);
+    
+    const result = await getMemorybankProgress(testFile);
+    const expectedProgress: MemorybankProgress = {
+      sections: [],
+    };
+
+    expect(result).toEqual(expectedProgress);
+  });
+
+  it("should handle progress with empty sections", async () => {
     const content = `
-## Empty Section
-### Empty Subsection
+## Empty Section 1
+## Empty Section 2
 `;
 
     await fs.writeFile(testFile, content);
     const result = await getMemorybankProgress(testFile);
 
-    const expected: MemorybankSection = {
-      title: "Empty Section",
-      subsections: [
+    const expectedProgress: MemorybankProgress = {
+      sections: [
         {
-          title: "Empty Subsection",
-          items: [],
+          title: "Empty Section 1",
+          subsections: [],
+        },
+        {
+          title: "Empty Section 2",
+          subsections: [],
         },
       ],
     };
 
-    expect(result.sections).toHaveLength(1);
-    expect(result.sections[0]).toEqual(expected);
+    expect(result).toEqual(expectedProgress);
+  });
+
+  it("should handle progress with empty subsections", async () => {
+    const content = `
+## Section 1
+### Empty Subsection 1
+### Empty Subsection 2
+`;
+
+    await fs.writeFile(testFile, content);
+    const result = await getMemorybankProgress(testFile);
+
+    const expectedProgress: MemorybankProgress = {
+      sections: [
+        {
+          title: "Section 1",
+          subsections: [
+            {
+              title: "Empty Subsection 1",
+              items: [],
+            },
+            {
+              title: "Empty Subsection 2",
+              items: [],
+            },
+          ],
+        },
+      ],
+    };
+
+    expect(result).toEqual(expectedProgress);
   });
 
   it("should throw error for subsection before section", async () => {
