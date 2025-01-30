@@ -1,0 +1,72 @@
+{
+  "name": "@amazon1148/memorybank-status",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A command-line tool for parsing and displaying memory bank status from markdown files, with support for Roo Code's Memory Bank",
+  "main": "dist/memorybank-status.js",
+  "bin": {
+    "memorybank-status": "./dist/memorybank-status.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "prebuild": "npm run clean",
+    "build": "npm run check-types && npm run lint && npm run docs && tsc",
+    "clean": "rimraf dist docs coverage .nyc_output *.tsbuildinfo .tscache",
+    "start": "node dist/memorybank-status.js",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --ignore-pattern '**/*.test.ts' && npm run lint:md && npm run lint:docs",
+    "lint:md": "prettier --check README.md",
+    "lint:docs": "typedoc --validation",
+    "lint:fix": "prettier --write . && eslint . --fix",
+    "docs": "typedoc --out docs",
+    "docs:watch": "typedoc --out docs --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky",
+    "prepublishOnly": "npm run test && npm run build"
+  },
+  "keywords": [
+    "memorybank",
+    "markdown",
+    "cli",
+    "roo-code",
+    "memory-bank"
+  ],
+  "author": "amazon1148",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amazon1148/memorybank-status.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amazon1148/memorybank-status/issues"
+  },
+  "homepage": "https://github.com/amazon1148/memorybank-status#readme",
+  "devDependencies": {
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "husky": "^9.0.7",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "typedoc": "^0.25.7",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2",
+    "@vitest/coverage-v8": "^1.2.2"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ],
+    "src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
+}

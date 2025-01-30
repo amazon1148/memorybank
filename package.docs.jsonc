@@ -1,0 +1,74 @@
+/**
+ * This is a TypeScript ES Module Node.js project.
+ * - Uses "type": "module" for native ESM support
+ * - TypeScript configured for ESM output
+ * - Node.js native ESM imports (e.g., node:fs)
+ */
+{
+	"name": "@amazon1148/memorybank-status",
+	"version": "1.0.0",
+	// Enables native ES Module support
+	"type": "module",
+	"description": "A command-line tool for parsing and displaying memory bank status from markdown files, with support for Roo Code's Memory Bank",
+	// Output paths configured for ES modules
+	"main": "dist/memorybank-status.js",
+	"bin": {
+		"memorybank-status": "./dist/memorybank-status.js",
+	},
+	"files": ["dist", "README.md"],
+	"scripts": {
+		// Build scripts
+		"prebuild": "npm run clean",
+		"build": "npm run lint && npm run docs && tsc",
+		"clean": "rm -rf dist docs",
+		// TypeScript compilation preserves ES module format
+		"start": "node dist/memorybank-status.js",
+		// Linting scripts
+		"lint": "npm run lint:ts && npm run lint:md && npm run lint:docs",
+		"lint:ts": "eslint . --ext .ts",
+		"lint:md": "markdownlint '**/*.md' --ignore node_modules",
+		"lint:docs": "typedoc --validation",
+		"lint:fix": "npm run lint:ts -- --fix && npm run lint:md -- --fix",
+		// Documentation scripts
+		"docs": "typedoc --out docs src/",
+		"docs:watch": "typedoc --out docs src/ --watch",
+		// Test scripts
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage",
+		// Pre-publish checks
+		"prepublishOnly": "npm run test && npm run build",
+	},
+	"keywords": ["memorybank", "markdown", "cli", "roo-code", "memory-bank"],
+	"author": "amazon1148",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/amazon1148/memorybank-status.git",
+	},
+	"bugs": {
+		"url": "https://github.com/amazon1148/memorybank-status/issues",
+	},
+	"homepage": "https://github.com/amazon1148/memorybank-status#readme",
+	"devDependencies": {
+		// TypeScript and Node.js type definitions
+		"@types/node": "^20.17.16",
+		"@typescript-eslint/eslint-plugin": "^6.0.0",
+		"@typescript-eslint/parser": "^6.0.0",
+		"@eslint/eslintrc": "^2.1.4",
+		// Linting tools
+		"eslint": "^8.0.0",
+		"markdownlint-cli": "^0.39.0",
+		// Documentation tools
+		"typedoc": "^0.25.8",
+		// Testing tools
+		"vitest": "^1.0.0",
+		"@vitest/coverage-v8": "^1.2.2",
+		// Other tools
+		"globals": "^13.24.0",
+		"typescript": "^5.7.3",
+	},
+	"publishConfig": {
+		"access": "public",
+	},
+}

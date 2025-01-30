@@ -1,13 +1,38 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../dist/lib",
-    "rootDir": "..",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "rootDir": ".",
     "strict": true,
-    "noImplicitAny": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "useDefineForClassFields": true,
+    "experimentalDecorators": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "useUnknownInCatchVariables": false,
+    "lib": ["es2022", "esnext.disposable"],
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*"]
+    }
   },
-  "include": ["./**/*.ts", "../scripts/**/*.ts"],
-  "references": [{ "path": "../scripts" }]
+  "ts-node": {
+    "esm": true
+  },
+  "include": [
+    "memorybank-parser.ts",
+    "memorybank-status.ts",
+    "logger.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist", ".vscode-test"]
 }
