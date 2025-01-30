@@ -15,9 +15,9 @@ type StatusType = typeof STATUS[keyof typeof STATUS];
  */
 export interface MemorybankItem {
   /** The text content of the checklist item */
-  text: string;
+  readonly text: string;
   /** The status of the item: completed, partial, not implemented, or pending */
-  status: StatusType;
+  readonly status: StatusType;
 }
 
 /**
@@ -25,9 +25,9 @@ export interface MemorybankItem {
  */
 export interface MemorybankSubsection {
   /** The title of the subsection */
-  title: string;
+  readonly title: string;
   /** The checklist items contained in this subsection */
-  items: MemorybankItem[];
+  readonly items: readonly MemorybankItem[];
 }
 
 /**
@@ -35,9 +35,9 @@ export interface MemorybankSubsection {
  */
 export interface MemorybankSection {
   /** The title of the section */
-  title: string;
+  readonly title: string;
   /** The subsections contained in this section */
-  subsections: MemorybankSubsection[];
+  readonly subsections: readonly MemorybankSubsection[];
 }
 
 /**
@@ -45,21 +45,21 @@ export interface MemorybankSection {
  */
 export interface MemorybankProgress {
   /** The main sections of the document */
-  sections: MemorybankSection[];
+  readonly sections: readonly MemorybankSection[];
 }
 
 /**
  * Handles the parsing state and progress building
  */
 class ProgressBuilder {
-  private progress: MemorybankProgress = { sections: [] };
+  private readonly progress: MemorybankProgress = { sections: [] };
   private currentSection: MemorybankSection | null = null;
   private currentSubsection: MemorybankSubsection | null = null;
 
   /**
    * Get the built progress
    */
-  getProgress(): MemorybankProgress {
+  getProgress(): Readonly<MemorybankProgress> {
     return this.progress;
   }
 
@@ -72,7 +72,7 @@ class ProgressBuilder {
       title: line.slice(3).trim(),
       subsections: [],
     };
-    this.progress.sections.push(this.currentSection);
+    (this.progress.sections as MemorybankSection[]).push(this.currentSection);
     this.currentSubsection = null;
   }
 
@@ -89,7 +89,7 @@ class ProgressBuilder {
       title: line.slice(4).trim(),
       items: [],
     };
-    this.currentSection.subsections.push(this.currentSubsection);
+    (this.currentSection.subsections as MemorybankSubsection[]).push(this.currentSubsection);
   }
 
   /**
@@ -106,11 +106,11 @@ class ProgressBuilder {
         title: "Default",
         items: [],
       };
-      this.currentSection.subsections.push(this.currentSubsection);
+      (this.currentSection.subsections as MemorybankSubsection[]).push(this.currentSubsection);
     }
 
     const item = this.parseItem(line);
-    this.currentSubsection.items.push(item);
+    (this.currentSubsection.items as MemorybankItem[]).push(item);
   }
 
   /**
