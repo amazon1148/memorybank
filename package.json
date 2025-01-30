@@ -15,7 +15,7 @@
     "prebuild": "npm run clean",
     "build": "npm run check-types && npm run lint && npm run docs && tsc",
     "clean": "rimraf dist docs coverage .nyc_output *.tsbuildinfo .tscache",
-    "start": "node dist/memorybank-status.js",
+    "start": "node --es-module-specifier-resolution=node dist/memorybank-status.js --docs-path=~/workspace/vscode-context/cline_docs",
     "check-types": "tsc --noEmit",
     "lint": "eslint . --ignore-pattern '**/*.test.ts' && npm run lint:md && npm run lint:docs",
     "lint:md": "prettier --check README.md",

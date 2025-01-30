@@ -70,7 +70,7 @@ interface MutableSection {
  * Handles the parsing state and progress building
  */
 class ProgressBuilder {
-  private sections: MutableSection[] = [];
+  private readonly sections: MutableSection[] = [];
   private currentSection: MutableSection | null = null;
   private currentSubsection: MutableSubsection | null = null;
 

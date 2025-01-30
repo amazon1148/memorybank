@@ -32,7 +32,9 @@
     "memorybank-parser.ts",
     "memorybank-status.ts",
     "logger.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "memorybank-parser.test.ts",
+    "memorybank-status.test.ts"
   ],
   "exclude": ["node_modules", "dist", ".vscode-test"]
 }

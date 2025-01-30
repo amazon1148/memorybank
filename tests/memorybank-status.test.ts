@@ -1,9 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { promises as fs } from "node:fs";
 import {
   toTildePath,
   getDocsPathValue,
-  getGitPath,
   validateRepositories,
 } from "../memorybank-status";
 
