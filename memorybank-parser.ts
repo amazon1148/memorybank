@@ -1,13 +1,23 @@
 import { promises as fs } from "node:fs";
 
+// Status emoji constants to ensure consistent Unicode handling
+const STATUS = {
+  COMPLETE: "✅",
+  WARNING: "⚠" + "️", // Split combined character
+  ERROR: "❌",
+  PENDING: "pending",
+} as const;
+
+type StatusType = typeof STATUS[keyof typeof STATUS];
+
 /**
  * Represents a single checklist item in a Memory Bank document
  */
 export interface MemorybankItem {
   /** The text content of the checklist item */
   text: string;
-  /** The status of the item: completed (✅), partial (⚠️), not implemented (❌), or pending */
-  status: "✅" | "⚠️" | "❌" | "pending";
+  /** The status of the item: completed, partial, not implemented, or pending */
+  status: StatusType;
 }
 
 /**
@@ -88,19 +98,19 @@ export async function getMemorybankProgress(filePath: string): Promise<Memoryban
       }
 
       const itemText = line.slice(2).trim();
-      let status: MemorybankItem["status"] = "pending";
+      let status: StatusType = STATUS.PENDING;
 
-      if (itemText.startsWith("✅")) {
-        status = "✅";
-      } else if (itemText.startsWith("⚠️")) {
-        status = "⚠️";
-      } else if (itemText.startsWith("❌")) {
-        status = "❌";
+      if (itemText.startsWith(STATUS.COMPLETE)) {
+        status = STATUS.COMPLETE;
+      } else if (itemText.startsWith(STATUS.WARNING)) {
+        status = STATUS.WARNING;
+      } else if (itemText.startsWith(STATUS.ERROR)) {
+        status = STATUS.ERROR;
       }
 
-      // Remove status emoji using string operations instead of regex
+      // Remove status emoji using string operations
       let cleanText = itemText;
-      if (status !== "pending") {
+      if (status !== STATUS.PENDING) {
         cleanText = itemText.slice(status.length).trim();
       }
 
