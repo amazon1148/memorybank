@@ -49,18 +49,47 @@ export interface MemorybankProgress {
 }
 
 /**
+ * Internal mutable interfaces for building progress
+ */
+interface MutableItem {
+  text: string;
+  status: StatusType;
+}
+
+interface MutableSubsection {
+  title: string;
+  items: MutableItem[];
+}
+
+interface MutableSection {
+  title: string;
+  subsections: MutableSubsection[];
+}
+
+/**
  * Handles the parsing state and progress building
  */
 class ProgressBuilder {
-  private readonly progress: MemorybankProgress = { sections: [] };
-  private currentSection: MemorybankSection | null = null;
-  private currentSubsection: MemorybankSubsection | null = null;
+  private sections: MutableSection[] = [];
+  private currentSection: MutableSection | null = null;
+  private currentSubsection: MutableSubsection | null = null;
 
   /**
    * Get the built progress
    */
-  getProgress(): Readonly<MemorybankProgress> {
-    return this.progress;
+  getProgress(): MemorybankProgress {
+    return {
+      sections: this.sections.map(section => ({
+        title: section.title,
+        subsections: section.subsections.map(subsection => ({
+          title: subsection.title,
+          items: subsection.items.map(item => ({
+            text: item.text,
+            status: item.status,
+          })),
+        })),
+      })),
+    };
   }
 
   /**
@@ -72,7 +101,7 @@ class ProgressBuilder {
       title: line.slice(3).trim(),
       subsections: [],
     };
-    (this.progress.sections as MemorybankSection[]).push(this.currentSection);
+    this.sections.push(this.currentSection);
     this.currentSubsection = null;
   }
 
@@ -89,7 +118,7 @@ class ProgressBuilder {
       title: line.slice(4).trim(),
       items: [],
     };
-    (this.currentSection.subsections as MemorybankSubsection[]).push(this.currentSubsection);
+    this.currentSection.subsections.push(this.currentSubsection);
   }
 
   /**
@@ -106,11 +135,11 @@ class ProgressBuilder {
         title: "Default",
         items: [],
       };
-      (this.currentSection.subsections as MemorybankSubsection[]).push(this.currentSubsection);
+      this.currentSection.subsections.push(this.currentSubsection);
     }
 
     const item = this.parseItem(line);
-    (this.currentSubsection.items as MemorybankItem[]).push(item);
+    this.currentSubsection.items.push(item);
   }
 
   /**
@@ -118,7 +147,7 @@ class ProgressBuilder {
    * @param line Line to parse
    * @returns Parsed item
    */
-  private parseItem(line: string): MemorybankItem {
+  private parseItem(line: string): MutableItem {
     const itemText = line.slice(2).trim();
     const status = this.getItemStatus(itemText);
     const text = status !== STATUS.PENDING 
