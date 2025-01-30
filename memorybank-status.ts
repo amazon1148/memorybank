@@ -4,11 +4,6 @@ import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { getMemorybankProgress } from "./memorybank-parser";
 
-const GIT_PATHS = {
-  WINDOWS: "C:\\Program Files\\Git\\bin\\git.cmd",
-  UNIX: "/usr/bin/git",
-} as const;
-
 /**
  * Convert a path with ~ to absolute path
  * @param inputPath Path that may contain ~
@@ -19,14 +14,6 @@ export function toTildePath(inputPath: string): string {
     return path.join(os.homedir(), inputPath.slice(1));
   }
   return inputPath;
-}
-
-/**
- * Get the Git executable path based on OS
- * @returns Path to Git executable
- */
-export function getGitPath(): string {
-  return process.platform === "win32" ? GIT_PATHS.WINDOWS : GIT_PATHS.UNIX;
 }
 
 /**
