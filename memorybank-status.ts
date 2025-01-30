@@ -66,6 +66,33 @@ export async function validateRepositories(docsPath: string): Promise<void> {
 }
 
 /**
+ * Print an item based on its status
+ * @param item Progress item to print
+ * @param showIncomplete Whether to only show incomplete items
+ */
+function printItem(item: { status: string; text: string }, showIncomplete: boolean): void {
+  if (!showIncomplete || item.status !== "✅") {
+    console.log(`- ${item.status === "pending" ? "" : item.status} ${item.text}`);
+  }
+}
+
+/**
+ * Print a subsection and its items
+ * @param subsection Subsection to print
+ * @param showIncomplete Whether to only show incomplete items
+ */
+function printSubsection(
+  subsection: { title: string; items: Array<{ status: string; text: string }> },
+  showIncomplete: boolean
+): void {
+  if (subsection.title !== "Default") {
+    console.log(`\n### ${subsection.title}`);
+  }
+
+  subsection.items.forEach(item => printItem(item, showIncomplete));
+}
+
+/**
  * Process a single markdown file
  * @param filePath Path to markdown file
  * @param showIncomplete Only show incomplete items
@@ -74,27 +101,15 @@ async function processFile(filePath: string, showIncomplete = false): Promise<vo
   try {
     const progress = await getMemorybankProgress(filePath);
 
-    for (const section of progress.sections) {
+    progress.sections.forEach(section => {
       console.log(`\n## ${section.title}`);
-
-      for (const subsection of section.subsections) {
-        if (subsection.title !== "Default") {
-          console.log(`\n### ${subsection.title}`);
-        }
-
-        for (const item of subsection.items) {
-          if (!showIncomplete || item.status !== "✅") {
-            console.log(`- ${item.status === "pending" ? "" : item.status} ${item.text}`);
-          }
-        }
-      }
-    }
+      section.subsections.forEach(subsection => 
+        printSubsection(subsection, showIncomplete)
+      );
+    });
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(`Error processing ${filePath}:`, error.message);
-    } else {
-      console.error(`Unknown error processing ${filePath}`);
-    }
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error(`Error processing ${filePath}: ${errorMessage}`);
     process.exit(1);
   }
 }
@@ -122,11 +137,8 @@ async function processDocsDirectory(docsPath: string, showIncomplete = false): P
       await processFile(filePath, showIncomplete);
     }
   } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error:", error.message);
-    } else {
-      console.error("Unknown error occurred");
-    }
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    console.error("Error:", errorMessage);
     process.exit(1);
   }
 }
