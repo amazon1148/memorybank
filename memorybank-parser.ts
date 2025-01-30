@@ -49,65 +49,96 @@ export interface MemorybankProgress {
 }
 
 /**
- * Get the status from a line of text
- * @param text Line of text to check
- * @returns Status type
+ * Handles the parsing state and progress building
  */
-function getItemStatus(text: string): StatusType {
-  if (text.startsWith(STATUS.COMPLETE)) return STATUS.COMPLETE;
-  if (text.startsWith(STATUS.WARNING)) return STATUS.WARNING;
-  if (text.startsWith(STATUS.ERROR)) return STATUS.ERROR;
-  return STATUS.PENDING;
-}
+class ProgressBuilder {
+  private progress: MemorybankProgress = { sections: [] };
+  private currentSection: MemorybankSection | null = null;
+  private currentSubsection: MemorybankSubsection | null = null;
 
-/**
- * Parse a checklist item line
- * @param line Line of text to parse
- * @returns Parsed item
- */
-function parseItem(line: string): MemorybankItem {
-  const itemText = line.slice(2).trim();
-  const status = getItemStatus(itemText);
-  const text = status !== STATUS.PENDING 
-    ? itemText.slice(status.length).trim()
-    : itemText;
+  /**
+   * Get the built progress
+   */
+  getProgress(): MemorybankProgress {
+    return this.progress;
+  }
 
-  return { text, status };
-}
+  /**
+   * Process a section line
+   * @param line Line to process
+   */
+  processSection(line: string): void {
+    this.currentSection = {
+      title: line.slice(3).trim(),
+      subsections: [],
+    };
+    this.progress.sections.push(this.currentSection);
+    this.currentSubsection = null;
+  }
 
-/**
- * Create a new section from a line
- * @param line Line of text to parse
- * @returns New section
- */
-function createSection(line: string): MemorybankSection {
-  return {
-    title: line.slice(3).trim(),
-    subsections: [],
-  };
-}
+  /**
+   * Process a subsection line
+   * @param line Line to process
+   */
+  processSubsection(line: string): void {
+    if (!this.currentSection) {
+      throw new Error("Found subsection before section");
+    }
 
-/**
- * Create a new subsection from a line
- * @param line Line of text to parse
- * @returns New subsection
- */
-function createSubsection(line: string): MemorybankSubsection {
-  return {
-    title: line.slice(4).trim(),
-    items: [],
-  };
-}
+    this.currentSubsection = {
+      title: line.slice(4).trim(),
+      items: [],
+    };
+    this.currentSection.subsections.push(this.currentSubsection);
+  }
 
-/**
- * Create a default subsection
- * @returns Default subsection
- */
-function createDefaultSubsection(): MemorybankSubsection {
-  return {
-    title: "Default",
-    items: [],
-  };
+  /**
+   * Process an item line
+   * @param line Line to process
+   */
+  processItem(line: string): void {
+    if (!this.currentSection) {
+      throw new Error("Found item before section");
+    }
+
+    if (!this.currentSubsection) {
+      this.currentSubsection = {
+        title: "Default",
+        items: [],
+      };
+      this.currentSection.subsections.push(this.currentSubsection);
+    }
+
+    const item = this.parseItem(line);
+    this.currentSubsection.items.push(item);
+  }
+
+  /**
+   * Parse a line into an item
+   * @param line Line to parse
+   * @returns Parsed item
+   */
+  private parseItem(line: string): MemorybankItem {
+    const itemText = line.slice(2).trim();
+    const status = this.getItemStatus(itemText);
+    const text = status !== STATUS.PENDING 
+      ? itemText.slice(status.length).trim()
+      : itemText;
+
+    return { text, status };
+  }
+
+  /**
+   * Get the status from text
+   * @param text Text to check
+   * @returns Status type
+   */
+  private getItemStatus(text: string): StatusType {
+    if (text.startsWith(STATUS.COMPLETE)) return STATUS.COMPLETE;
+    if (text.startsWith(STATUS.WARNING)) return STATUS.WARNING;
+    if (text.startsWith(STATUS.ERROR)) return STATUS.ERROR;
+    return STATUS.PENDING;
+  }
 }
 
 /**
@@ -118,46 +149,22 @@ function createDefaultSubsection(): MemorybankSubsection {
 export async function getMemorybankProgress(filePath: string): Promise<MemorybankProgress> {
   const content = await fs.readFile(filePath, "utf-8");
   const lines = content.split("\n");
-  const progress: MemorybankProgress = { sections: [] };
-
-  let currentSection: MemorybankSection | null = null;
-  let currentSubsection: MemorybankSubsection | null = null;
+  const builder = new ProgressBuilder();
 
   for (const line of lines) {
-    // Skip empty lines
-    if (!line.trim()) continue;
+    const trimmedLine = line.trim();
+    if (!trimmedLine) continue;
 
-    if (line.startsWith("## ")) {
-      currentSection = createSection(line);
-      progress.sections.push(currentSection);
-      currentSubsection = null;
-      continue;
-    }
-
-    if (line.startsWith("### ")) {
-      if (!currentSection) {
-        throw new Error("Found subsection before section");
-      }
-      currentSubsection = createSubsection(line);
-      currentSection.subsections.push(currentSubsection);
-      continue;
-    }
-
-    if (line.startsWith("- ")) {
-      if (!currentSection) {
-        throw new Error("Found item before section");
-      }
-
-      if (!currentSubsection) {
-        currentSubsection = createDefaultSubsection();
-        currentSection.subsections.push(currentSubsection);
-      }
-
-      currentSubsection.items.push(parseItem(line));
+    if (trimmedLine.startsWith("## ")) {
+      builder.processSection(trimmedLine);
+    } else if (trimmedLine.startsWith("### ")) {
+      builder.processSubsection(trimmedLine);
+    } else if (trimmedLine.startsWith("- ")) {
+      builder.processItem(trimmedLine);
     }
   }
 
-  return progress;
+  return builder.getProgress();
 }
 
 // If run directly, parse the file specified as argument
