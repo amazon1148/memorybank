@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
-import { getMemorybankProgress } from "./memorybank-parser";
+import { getMemorybankProgress, MemorybankItem, MemorybankSubsection } from "./memorybank-parser";
 
 /**
  * Convert a path with ~ to absolute path
@@ -57,7 +57,7 @@ export async function validateRepositories(docsPath: string): Promise<void> {
  * @param item Progress item to print
  * @param showIncomplete Whether to only show incomplete items
  */
-function printItem(item: { status: string; text: string }, showIncomplete: boolean): void {
+function printItem(item: MemorybankItem, showIncomplete: boolean): void {
   if (!showIncomplete || item.status !== "✅") {
     console.log(`- ${item.status === "pending" ? "" : item.status} ${item.text}`);
   }
@@ -69,7 +69,7 @@ function printItem(item: { status: string; text: string }, showIncomplete: boole
  * @param showIncomplete Whether to only show incomplete items
  */
 function printSubsection(
-  subsection: { title: string; items: Array<{ status: string; text: string }> },
+  subsection: MemorybankSubsection,
   showIncomplete: boolean
 ): void {
   if (subsection.title !== "Default") {
