@@ -49,6 +49,68 @@ export interface MemorybankProgress {
 }
 
 /**
+ * Get the status from a line of text
+ * @param text Line of text to check
+ * @returns Status type
+ */
+function getItemStatus(text: string): StatusType {
+  if (text.startsWith(STATUS.COMPLETE)) return STATUS.COMPLETE;
+  if (text.startsWith(STATUS.WARNING)) return STATUS.WARNING;
+  if (text.startsWith(STATUS.ERROR)) return STATUS.ERROR;
+  return STATUS.PENDING;
+}
+
+/**
+ * Parse a checklist item line
+ * @param line Line of text to parse
+ * @returns Parsed item
+ */
+function parseItem(line: string): MemorybankItem {
+  const itemText = line.slice(2).trim();
+  const status = getItemStatus(itemText);
+  const text = status !== STATUS.PENDING 
+    ? itemText.slice(status.length).trim()
+    : itemText;
+
+  return { text, status };
+}
+
+/**
+ * Create a new section from a line
+ * @param line Line of text to parse
+ * @returns New section
+ */
+function createSection(line: string): MemorybankSection {
+  return {
+    title: line.slice(3).trim(),
+    subsections: [],
+  };
+}
+
+/**
+ * Create a new subsection from a line
+ * @param line Line of text to parse
+ * @returns New subsection
+ */
+function createSubsection(line: string): MemorybankSubsection {
+  return {
+    title: line.slice(4).trim(),
+    items: [],
+  };
+}
+
+/**
+ * Create a default subsection
+ * @returns Default subsection
+ */
+function createDefaultSubsection(): MemorybankSubsection {
+  return {
+    title: "Default",
+    items: [],
+  };
+}
+
+/**
  * Parse a markdown file and extract checklist progress information
  * @param filePath Path to the markdown file
  * @returns Promise resolving to the parsed progress data
@@ -56,68 +118,42 @@ export interface MemorybankProgress {
 export async function getMemorybankProgress(filePath: string): Promise<MemorybankProgress> {
   const content = await fs.readFile(filePath, "utf-8");
   const lines = content.split("\n");
-
-  const progress: MemorybankProgress = {
-    sections: [],
-  };
+  const progress: MemorybankProgress = { sections: [] };
 
   let currentSection: MemorybankSection | null = null;
   let currentSubsection: MemorybankSubsection | null = null;
 
   for (const line of lines) {
+    // Skip empty lines
+    if (!line.trim()) continue;
+
     if (line.startsWith("## ")) {
-      // New section
-      currentSection = {
-        title: line.slice(3).trim(),
-        subsections: [],
-      };
+      currentSection = createSection(line);
       progress.sections.push(currentSection);
       currentSubsection = null;
-    } else if (line.startsWith("### ")) {
-      // New subsection
+      continue;
+    }
+
+    if (line.startsWith("### ")) {
       if (!currentSection) {
         throw new Error("Found subsection before section");
       }
-      currentSubsection = {
-        title: line.slice(4).trim(),
-        items: [],
-      };
+      currentSubsection = createSubsection(line);
       currentSection.subsections.push(currentSubsection);
-    } else if (line.startsWith("- ")) {
-      // Checklist item
+      continue;
+    }
+
+    if (line.startsWith("- ")) {
+      if (!currentSection) {
+        throw new Error("Found item before section");
+      }
+
       if (!currentSubsection) {
-        // If no subsection, create default one
-        if (!currentSection) {
-          throw new Error("Found item before section");
-        }
-        currentSubsection = {
-          title: "Default",
-          items: [],
-        };
+        currentSubsection = createDefaultSubsection();
         currentSection.subsections.push(currentSubsection);
       }
 
-      const itemText = line.slice(2).trim();
-      let status: StatusType = STATUS.PENDING;
-
-      if (itemText.startsWith(STATUS.COMPLETE)) {
-        status = STATUS.COMPLETE;
-      } else if (itemText.startsWith(STATUS.WARNING)) {
-        status = STATUS.WARNING;
-      } else if (itemText.startsWith(STATUS.ERROR)) {
-        status = STATUS.ERROR;
-      }
-
-      // Remove status emoji using string operations
-      let cleanText = itemText;
-      if (status !== STATUS.PENDING) {
-        cleanText = itemText.slice(status.length).trim();
-      }
-
-      currentSubsection.items.push({
-        text: cleanText,
-        status,
-      });
+      currentSubsection.items.push(parseItem(line));
     }
   }
 
