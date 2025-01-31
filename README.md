@@ -1,6 +1,8 @@
-# Memory Bank CLI
+# memorybank
 
-A command-line tool for parsing and displaying checklist status from markdown files. Designed to work with Roo Code's Memory Bank ([GitHub](https://github.com/RooVetGit/Roo-Code/blob/main/prompting/custom%20instructions%20library/roo-code-memory-bank.md) | [Documentation](https://docs.roo.vet/improving-your-prompting-skills/custom-instructions-library/roo-code-memory-bank)), a system that helps maintain perfect documentation across memory resets.
+**Keep your Roo Code Memory Bank in check, streamline collaboration, and boost your productivity.**
+
+`memorybank` is a command-line tool designed to help you manage your project documentation when working with Roo Code and its Memory Bank system. It provides a fast and easy way to track the status of your project's context, ensuring accuracy, preventing data loss, and facilitating seamless collaboration within your software development lifecycle.
 
 ## Installation
 
@@ -11,13 +13,13 @@ npm install -g memorybank
 
 ## Usage
 
-The tool assumes your Memory Bank files are in the current directory. You can optionally specify a different directory with --docs-path.
+The tool assumes your Memory Bank files are in the current directory. You can optionally specify a different directory with `--docs-path`.
 
 ```bash
 # Run in current directory
 memorybank
 
-# Run with incomplete items only
+# Run and show incomplete items only
 memorybank --incomplete
 
 # Run in a specific directory
@@ -27,17 +29,27 @@ memorybank --docs-path=/path/to/docs
 memorybank --docs-path=/path/to/docs --incomplete
 ```
 
+## Key Benefits
+
+*   **Maintain Context Accuracy:** Quickly see the status (✅ ⚠️ ❌) of your Memory Bank documentation, ensuring your project context is always up-to-date and preventing knowledge gaps.
+*   **Prevent Data Loss:** Get an instant view of the Git status of your documentation files, reminding you to keep them version-controlled and avoid accidental overwrites.
+*   **Streamline Collaboration:** Share a comprehensive status report, including documentation paths or Git repository URL, with other agents (search, chatbots, etc.) and team members, facilitating efficient collaboration.
+*   **Reduce Costs and Stay Focused:** Manage your context effectively, minimizing what is loaded into your IDE Agent's working memory, and ensuring that the correct context is available to switch between tasks while reducing the processing time and the cost of using the AI.
+*   **Uninterrupted Workflow:** Check and update documentation status and git repository status using the CLI, allowing you to maintain your coding flow without pausing your IDE agent.
+
 ## Features
 
-- Parse markdown files with checklist items
-- Display status with emoji indicators (✅ ⚠️ ❌)
-- Filter incomplete items with `--incomplete` flag
-- Native support for Roo Code's Memory Bank files:
-    - productContext.md
-    - activeContext.md
-    - systemPatterns.md
-    - techContext.md
-    - progress.md
+-   Parse markdown files with memorybank items
+-   Display status with emoji indicators (✅ ⚠️ ❌)
+-   Filter incomplete items with `--incomplete` flag
+-   Native support for Roo Code's Memory Bank files:
+    -   `productContext.md`
+    -   `activeContext.md`
+    -   `systemPatterns.md`
+    -   `techContext.md`
+    -   `progress.md`
+-   Git status display for documentation files
+-   Output documentation file paths and Git repository information for easy sharing with other agents.
 
 ## Documentation Directory
 
@@ -56,13 +68,13 @@ memorybank --docs-path=~/workspace/project/docs
 
 The directory must contain the following Memory Bank files:
 
-- productContext.md
-- activeContext.md
-- systemPatterns.md
-- techContext.md
-- progress.md
+-   `productContext.md`
+-   `activeContext.md`
+-   `systemPatterns.md`
+-   `techContext.md`
+-   `progress.md`
 
-## Checklist Format
+## memorybank Format
 
 The tool expects markdown files with the following format:
 
@@ -104,8 +116,7 @@ npm run build
 
 ## Related Documentation
 
-- [Roo Code's Memory Bank Documentation](https://docs.roo.vet/improving-your-prompting-skills/custom-instructions-library/roo-code-memory-bank) - Official documentation
-- [Roo Code's Memory Bank GitHub](https://github.com/RooVetGit/Roo-Code/blob/main/prompting/custom%20instructions%20library/roo-code-memory-bank.md) - Source repository
+-   [Cline/Roo Code's Memory Bank Documentation](https://docs.cline.bot/improving-your-prompting-skills/custom-instructions-library/cline-memory-bank) - Official documentation
 
 ## License
 
