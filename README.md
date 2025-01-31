@@ -55,6 +55,7 @@ memorybank --docs-path=~/workspace/project/docs
 ```
 
 The directory must contain the following Memory Bank files:
+
 - productContext.md
 - activeContext.md
 - systemPatterns.md

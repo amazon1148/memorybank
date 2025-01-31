@@ -1,16 +1,16 @@
 {
-  "entryPoints": ["./memorybank-status.ts", "./memorybank-parser.ts"],
-  "out": "docs",
-  "excludePrivate": true,
-  "excludeProtected": true,
-  "excludeExternals": true,
-  "theme": "default",
-  "name": "memorybank",
-  "readme": "README.md",
-  "includeVersion": true,
-  "searchInComments": true,
-  "validation": {
-    "invalidLink": true,
-    "notExported": true
-  }
+	"entryPoints": ["./memorybank-status.ts", "./memorybank-parser.ts"],
+	"out": "docs",
+	"excludePrivate": true,
+	"excludeProtected": true,
+	"excludeExternals": true,
+	"theme": "default",
+	"name": "memorybank",
+	"readme": "README.md",
+	"includeVersion": true,
+	"searchInComments": true,
+	"validation": {
+		"invalidLink": true,
+		"notExported": true
+	}
 }

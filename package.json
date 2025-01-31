@@ -1,80 +1,80 @@
 {
-  "name": "memorybank",
-  "version": "1.0.1",
-  "type": "module",
-  "description": "A command-line tool for parsing and displaying memory bank status from markdown files, with support for Roo Code's Memory Bank",
-  "main": "dist/memorybank-status.js",
-  "bin": {
-    "memorybank": "bin/cli.js"
-  },
-  "files": [
-    "dist",
-    "bin",
-    "README.md"
-  ],
-  "scripts": {
-    "prebuild": "npm run clean",
-    "build": "npm run check-types && npm run lint && npm run docs && tsc && chmod +x dist/memorybank-status.js bin/cli.js",
-    "clean": "rimraf dist docs coverage .nyc_output *.tsbuildinfo .tscache",
-    "start": "NODE_NO_WARNINGS=1 ./bin/cli.js",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint . --ignore-pattern '**/*.test.ts' && npm run lint:md && npm run lint:docs",
-    "lint:md": "prettier --check README.md",
-    "lint:docs": "typedoc --validation",
-    "lint:fix": "prettier --write . && eslint . --fix",
-    "docs": "typedoc --out docs",
-    "docs:watch": "typedoc --out docs --watch",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "prepare": "husky",
-    "prepublishOnly": "npm run test && npm run build"
-  },
-  "keywords": [
-    "memorybank",
-    "markdown",
-    "cli",
-    "roo-code",
-    "memory-bank"
-  ],
-  "author": "amazon1148",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/amazon1148/memorybank.git"
-  },
-  "bugs": {
-    "url": "https://github.com/amazon1148/memorybank/issues"
-  },
-  "homepage": "https://github.com/amazon1148/memorybank#readme",
-  "devDependencies": {
-    "@types/node": "20.x",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "@vitest/coverage-v8": "^1.2.2",
-    "eslint": "^8.56.0",
-    "husky": "^9.0.7",
-    "lint-staged": "^15.2.0",
-    "prettier": "^3.2.5",
-    "rimraf": "^5.0.5",
-    "typedoc": "^0.25.7",
-    "typescript": "^5.3.3",
-    "vitest": "^1.2.2"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css,md}": [
-      "prettier --write"
-    ],
-    "src/**/*.{ts,tsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "@types/debug": "^4.1.12",
-    "debug": "^4.4.0"
-  }
+	"name": "memorybank",
+	"version": "1.0.1",
+	"type": "module",
+	"description": "A command-line tool for parsing and displaying memory bank status from markdown files, with support for Roo Code's Memory Bank",
+	"main": "dist/memorybank-status.js",
+	"bin": {
+		"memorybank": "bin/cli.js"
+	},
+	"files": [
+		"dist",
+		"bin",
+		"README.md"
+	],
+	"scripts": {
+		"prebuild": "npm run clean",
+		"build": "npm run check-types && npm run lint && npm run docs && tsc && chmod +x dist/memorybank-status.js bin/cli.js",
+		"clean": "rimraf dist docs coverage .nyc_output *.tsbuildinfo .tscache",
+		"start": "NODE_NO_WARNINGS=1 ./bin/cli.js",
+		"check-types": "tsc --noEmit",
+		"lint": "eslint . --ignore-pattern '**/*.test.ts' && npm run lint:md && npm run lint:docs",
+		"lint:md": "prettier --check README.md",
+		"lint:docs": "typedoc --validation",
+		"lint:fix": "prettier --write . && eslint . --fix",
+		"docs": "typedoc --out docs",
+		"docs:watch": "typedoc --out docs --watch",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage",
+		"prepare": "husky",
+		"prepublishOnly": "npm run test && npm run build"
+	},
+	"keywords": [
+		"memorybank",
+		"markdown",
+		"cli",
+		"roo-code",
+		"memory-bank"
+	],
+	"author": "amazon1148",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/amazon1148/memorybank.git"
+	},
+	"bugs": {
+		"url": "https://github.com/amazon1148/memorybank/issues"
+	},
+	"homepage": "https://github.com/amazon1148/memorybank#readme",
+	"devDependencies": {
+		"@types/node": "20.x",
+		"@typescript-eslint/eslint-plugin": "^6.21.0",
+		"@typescript-eslint/parser": "^6.21.0",
+		"@vitest/coverage-v8": "^1.2.2",
+		"eslint": "^8.56.0",
+		"husky": "^9.0.7",
+		"lint-staged": "^15.2.0",
+		"prettier": "^3.2.5",
+		"rimraf": "^5.0.5",
+		"typedoc": "^0.25.7",
+		"typescript": "^5.3.3",
+		"vitest": "^1.2.2"
+	},
+	"lint-staged": {
+		"*.{js,jsx,ts,tsx,json,css,md}": [
+			"prettier --write"
+		],
+		"src/**/*.{ts,tsx}": [
+			"prettier --write",
+			"eslint --fix"
+		]
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"@types/debug": "^4.1.12",
+		"debug": "^4.4.0"
+	}
 }
