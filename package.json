@@ -1,6 +1,6 @@
 {
-  "name": "@amazon1148/memorybank-status",
-  "version": "1.0.0",
+  "name": "memorybank",
+  "version": "1.0.1",
   "type": "module",
   "description": "A command-line tool for parsing and displaying memory bank status from markdown files, with support for Roo Code's Memory Bank",
   "main": "dist/memorybank-status.js",
@@ -41,12 +41,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/amazon1148/memorybank-status.git"
+    "url": "https://github.com/amazon1148/memorybank.git"
   },
   "bugs": {
-    "url": "https://github.com/amazon1148/memorybank-status/issues"
+    "url": "https://github.com/amazon1148/memorybank/issues"
   },
-  "homepage": "https://github.com/amazon1148/memorybank-status#readme",
+  "homepage": "https://github.com/amazon1148/memorybank#readme",
   "devDependencies": {
     "@types/node": "20.x",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
