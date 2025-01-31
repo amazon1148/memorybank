@@ -3,6 +3,8 @@ dist/
 docs/
 coverage/
 .nyc_output/
+*.tgz
+bin/
 
 # Dependencies
 node_modules/

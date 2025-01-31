@@ -8,7 +8,7 @@ import {
   MemorybankSection,
   MemorybankSubsection,
   MemorybankItem,
-} from "./memorybank-parser";
+} from "./memorybank-parser.js";
 
 /**
  * Create a test item with the given text and status

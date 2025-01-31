@@ -1,11 +1,11 @@
 {
-  "entryPoints": ["./memorybank-status.ts", "./memorybank-parser.ts", "./logger.ts"],
+  "entryPoints": ["./memorybank-status.ts", "./memorybank-parser.ts"],
   "out": "docs",
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeExternals": true,
   "theme": "default",
-  "name": "Memory Bank CLI",
+  "name": "memorybank",
   "readme": "README.md",
   "includeVersion": true,
   "searchInComments": true,

@@ -1,4 +1,7 @@
 import { promises as fs } from "node:fs";
+import Debug from "debug";
+
+const debug = Debug("memorybank:parser");
 
 // Status emoji constants to ensure consistent Unicode handling
 const STATUS = {
@@ -8,76 +11,62 @@ const STATUS = {
   PENDING: "pending",
 } as const;
 
-type StatusType = typeof STATUS[keyof typeof STATUS];
-
 /**
- * Represents a single checklist item in a Memory Bank document
+ * Represents a single item in a memorybank checklist
  */
 export interface MemorybankItem {
-  /** The text content of the checklist item */
-  readonly text: string;
-  /** The status of the item: completed, partial, not implemented, or pending */
-  readonly status: StatusType;
+  /** The text content of the item */
+  text: string;
+  /** The status of the item (✅, ⚠️, ❌, or "pending") */
+  status: string;
 }
 
 /**
- * Represents a subsection within a Memory Bank section
+ * Represents a subsection in a memorybank document that contains a list of items
  */
 export interface MemorybankSubsection {
   /** The title of the subsection */
-  readonly title: string;
-  /** The checklist items contained in this subsection */
-  readonly items: readonly MemorybankItem[];
+  title: string;
+  /** The list of items in this subsection */
+  items: MemorybankItem[];
 }
 
 /**
- * Represents a main section in a Memory Bank document
+ * Represents a major section in a memorybank document that contains subsections
  */
 export interface MemorybankSection {
   /** The title of the section */
-  readonly title: string;
-  /** The subsections contained in this section */
-  readonly subsections: readonly MemorybankSubsection[];
+  title: string;
+  /** The list of subsections in this section */
+  subsections: MemorybankSubsection[];
 }
 
 /**
- * Represents the complete progress data from a Memory Bank document
+ * Represents the complete structure of a memorybank progress document
+ * containing all sections, subsections, and items
  */
 export interface MemorybankProgress {
-  /** The main sections of the document */
-  readonly sections: readonly MemorybankSection[];
-}
-
-/**
- * Internal mutable interfaces for building progress
- */
-interface MutableItem {
-  text: string;
-  status: StatusType;
-}
-
-interface MutableSubsection {
-  title: string;
-  items: MutableItem[];
-}
-
-interface MutableSection {
-  title: string;
-  subsections: MutableSubsection[];
+  /** The list of all sections in the document */
+  sections: MemorybankSection[];
 }
 
 /**
  * Handles the parsing state and progress building
  */
 class ProgressBuilder {
-  private readonly sections: MutableSection[] = [];
-  private currentSection: MutableSection | null = null;
-  private currentSubsection: MutableSubsection | null = null;
+  sections: MemorybankSection[] = [];
+  currentSection: MemorybankSection | null = null;
+  currentSubsection: MemorybankSubsection | null = null;
+  hasImplementationStatus = false;
 
   /**
    * Get the built progress
    */
   getProgress(): MemorybankProgress {
+    debug("Getting final progress with %d sections", this.sections.length);
+    if (!this.hasImplementationStatus) {
+      throw new Error("No Implementation Status section found");
+    }
     return {
       sections: this.sections.map(section => ({
         title: section.title,
@@ -97,8 +86,13 @@ class ProgressBuilder {
    * @param line Line to process
    */
   processSection(line: string): void {
+    const title = line.slice(3).trim();
+    debug("Processing section: %s", title);
+    if (title === "Implementation Status") {
+      this.hasImplementationStatus = true;
+    }
     this.currentSection = {
-      title: line.slice(3).trim(),
+      title,
       subsections: [],
     };
     this.sections.push(this.currentSection);
@@ -111,11 +105,14 @@ class ProgressBuilder {
    */
   processSubsection(line: string): void {
     if (!this.currentSection) {
+      debug("Error: Found subsection before section");
       throw new Error("Found subsection before section");
     }
 
+    const title = line.slice(4).trim();
+    debug("Processing subsection: %s", title);
     this.currentSubsection = {
-      title: line.slice(4).trim(),
+      title,
       items: [],
     };
     this.currentSection.subsections.push(this.currentSubsection);
@@ -127,10 +124,12 @@ class ProgressBuilder {
    */
   processItem(line: string): void {
     if (!this.currentSection) {
+      debug("Error: Found item before section");
       throw new Error("Found item before section");
     }
 
     if (!this.currentSubsection) {
+      debug("Creating default subsection");
       this.currentSubsection = {
         title: "Default",
         items: [],
@@ -139,6 +138,7 @@ class ProgressBuilder {
     }
 
     const item = this.parseItem(line);
+    debug("Processed item: %s (status: %s)", item.text, item.status);
     this.currentSubsection.items.push(item);
   }
 
@@ -147,13 +147,12 @@ class ProgressBuilder {
    * @param line Line to parse
    * @returns Parsed item
    */
-  private parseItem(line: string): MutableItem {
+  parseItem(line: string): MemorybankItem {
     const itemText = line.slice(2).trim();
     const status = this.getItemStatus(itemText);
-    const text = status !== STATUS.PENDING 
+    const text = status !== STATUS.PENDING
       ? itemText.slice(status.length).trim()
       : itemText;
-
     return { text, status };
   }
 
@@ -162,7 +161,7 @@ class ProgressBuilder {
    * @param text Text to check
    * @returns Status type
    */
-  private getItemStatus(text: string): StatusType {
+  getItemStatus(text: string): string {
     if (text.startsWith(STATUS.COMPLETE)) return STATUS.COMPLETE;
     if (text.startsWith(STATUS.WARNING)) return STATUS.WARNING;
     if (text.startsWith(STATUS.ERROR)) return STATUS.ERROR;
@@ -176,40 +175,39 @@ class ProgressBuilder {
  * @returns Promise resolving to the parsed progress data
  */
 export async function getMemorybankProgress(filePath: string): Promise<MemorybankProgress> {
+  debug("Reading file: %s", filePath);
   const content = await fs.readFile(filePath, "utf-8");
   const lines = content.split("\n");
   const builder = new ProgressBuilder();
 
+  debug("Processing %d lines", lines.length);
   for (const line of lines) {
     const trimmedLine = line.trim();
     if (!trimmedLine) continue;
 
     if (trimmedLine.startsWith("## ")) {
-      builder.processSection(trimmedLine);
-    } else if (trimmedLine.startsWith("### ")) {
-      builder.processSubsection(trimmedLine);
-    } else if (trimmedLine.startsWith("- ")) {
-      builder.processItem(trimmedLine);
+      // Check if we're entering or leaving the Implementation Status section
+      if (trimmedLine === "## Implementation Status") {
+        debug("Found Implementation Status section");
+        builder.processSection(trimmedLine);
+      } else if (trimmedLine === "## Priority Tasks") {
+        debug("Found Priority Tasks section, stopping processing");
+        // Stop processing when we hit Priority Tasks section
+        break;
+      } else if (!builder.hasImplementationStatus) {
+        // Skip other sections if we're not in Implementation Status
+        debug("Skipping non-Implementation Status section: %s", trimmedLine);
+        continue;
+      }
+    } else if (builder.hasImplementationStatus) {
+      // Only process subsections and items when in Implementation Status
+      if (trimmedLine.startsWith("### ")) {
+        builder.processSubsection(trimmedLine);
+      } else if (trimmedLine.startsWith("- ")) {
+        builder.processItem(trimmedLine);
+      }
     }
   }
 
   return builder.getProgress();
-}
-
-// If run directly, parse the file specified as argument
-if (process.argv[1] === import.meta.url) {
-  const filePath = process.argv[2];
-  if (!filePath) {
-    console.error("Please provide a file path");
-    process.exit(1);
-  }
-
-  getMemorybankProgress(filePath)
-    .then((progress) => {
-      console.log(JSON.stringify(progress, null, 2));
-    })
-    .catch((error) => {
-      console.error("Error:", error.message);
-      process.exit(1);
-    });
 }

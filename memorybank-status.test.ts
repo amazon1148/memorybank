@@ -6,7 +6,7 @@ import {
   toTildePath,
   getDocsPathValue,
   validateRepositories,
-} from "./memorybank-status";
+} from "./memorybank-status.js";
 
 describe("memorybank-status", () => {
   describe("toTildePath", () => {
