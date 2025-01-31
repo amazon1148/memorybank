@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterAll, afterEach, vi } 
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import type { ExecException, ChildProcess } from 'node:child_process';
+import type { ChildProcess } from 'node:child_process';
 
 // Mock modules before any imports
 vi.mock('node:child_process', () => ({
@@ -138,9 +138,7 @@ describe("memorybank-status", () => {
 
   describe("processDocsDirectory", () => {
     const testDir = path.join(os.tmpdir(), "memorybank-test");
-    // Define expected strings for all tests
-    const GIT_REMOTE_HEADER = "\nGit Remote:";
-
+    
     // Helper function to setup git command mocks
     const setupGitMocks = (
       gitDirOutput: string,

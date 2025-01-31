@@ -282,7 +282,7 @@ export async function processDocsDirectory(docsPath: string, showIncomplete = fa
 }
 
 // If run directly, process command line arguments
-if (process.argv[1] && process.argv[1].endsWith('memorybank-status.js')) {
+if (process.argv[1]?.endsWith('memorybank-status.js')) {
   debug("Starting CLI with args: %O", process.argv.slice(2));
   const args = process.argv.slice(2);
   const showIncomplete = args.includes("--incomplete");
